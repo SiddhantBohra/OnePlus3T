@@ -251,7 +251,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 ARCH		?= $arm64
-CROSS_COMPILE	?= $(CCACHE) $../android/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+CROSS_COMPILE	?= $(CCACHE) $(CONFIG_CROSS_COMPILE:"%"=%)
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -355,8 +355,8 @@ include $(srctree)/scripts/Kbuild.include
 
 # Make variables (CC, etc...)
 AS		= $(CROSS_COMPILE)as
-LD		= $(CROSS_COMPILE)ld
-CC		= ccache $(CROSS_COMPILE)gcc
+LD		= $(CROSS_COMPILE)ld.bfd
+CC		= $(CCACHE) $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -379,7 +379,7 @@ AFLAGS_MODULE   =
 LDFLAGS_MODULE  = --strip-debug
 CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
 
 
 # Use USERINCLUDE when you must reference the UAPI directories only.
@@ -409,7 +409,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -std=gnu89
 		   		   
 # arter97's optimizations
-KBUILD_CFLAGS	+= -pipe -fno-pic -O2
+KBUILD_CFLAGS	+= -pipe -fno-pic -O2 -march=armv8-a+crc
 
 # Snapdragon 820 doesn't need 835769/843419 erratum fixes
 # some toolchain enables those fixes automatically, so opt-out
@@ -423,8 +423,6 @@ LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-835769)
 LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-843419)
 LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-843419)
 
-# Optimization for Kryo
-KBUILD_CFLAGS	+= -mcpu=cortex-a57
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
