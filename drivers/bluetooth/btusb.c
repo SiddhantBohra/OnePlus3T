@@ -23,12 +23,10 @@
 #include <linux/module.h>
 #include <linux/usb.h>
 #include <linux/firmware.h>
-#include <linux/suspend.h>
 
 #include <net/bluetooth/bluetooth.h>
 #include <net/bluetooth/hci_core.h>
 
-#include "ath3k.h"
 
 #define VERSION "0.6"
 
@@ -36,7 +34,7 @@ static bool disable_scofix;
 static bool force_scofix;
 
 static int sco_conn;
-static int reset = 1;
+static bool reset = true;
 
 static struct usb_driver btusb_driver;
 
@@ -2001,7 +1999,6 @@ static int btusb_probe(struct usb_interface *intf,
 		struct usb_device *udev = interface_to_usbdev(intf);
 		/* Old firmware would otherwise let ath3k driver load
 		 * patch and sysconfig files */
-
 		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
 			return -ENODEV;
 	}
